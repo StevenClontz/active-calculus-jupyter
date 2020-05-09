@@ -1,0 +1,149 @@
+<?xml version='1.0'?>
+
+  <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:str="http://exslt.org/strings"
+    extension-element-prefixes="exsl str"
+  >
+
+  <xsl:output method="text" encoding="UTF-8"/>
+
+  <xsl:template match="text()"/>
+
+  <xsl:template match="/">
+    {"cells": [
+      {
+       "cell_type": "markdown",
+       "metadata": {
+        "collapsed": false,
+        "editable": false
+       },
+       "source": [
+          "# (Section No.) (Title goes here)"
+       ]
+      },
+      <xsl:apply-templates select="/*/statement"/>
+    ]}
+  </xsl:template>
+
+  <xsl:template match="statement">
+      {
+       "cell_type": "markdown",
+       "metadata": {
+        "collapsed": false,
+        "editable": false
+       },
+       "source": [
+          "## (Preview) Activity (No.)"
+       ]
+      },
+    <xsl:apply-templates select="p|sidebyside/figure|sidebyside/table"/>
+  </xsl:template>
+
+  <xsl:template match="p">
+    <xsl:choose>
+      <xsl:when test="text()[normalize-space()]">
+        {
+         "cell_type": "markdown",
+         "metadata": {
+          "collapsed": false,
+          "editable": false
+         },
+         "source": [
+            "<xsl:apply-templates select="m|text()"/>"
+         ]
+        }
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="ol/li|ul/li"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:if test="position() != last()">,</xsl:if>
+  </xsl:template>
+
+  <xsl:template match="li">
+    {
+     "cell_type": "markdown",
+     "metadata": {
+      "collapsed": false,
+      "editable": false
+     },
+     "source": [
+        "<xsl:number format="a. "/> <xsl:apply-templates select="p/text()|p/m"/>"
+     ]
+    },
+    <xsl:if test="sidebyside/figure|sidebyside/table">
+      <xsl:apply-templates select="sidebyside/figure|sidebyside/table"/>,
+    </xsl:if>
+    {
+     "cell_type": "markdown",
+     "metadata": {
+      "collapsed": false,
+      "editable": true
+     },
+     "source": ""
+    }<xsl:if test="position() != last()">,</xsl:if>
+  </xsl:template>
+
+  <xsl:template match="image">
+    {
+     "cell_type": "markdown",
+     "metadata": {
+      "collapsed": false,
+      "editable": false
+     },
+     "source": [
+        "&lt;img src=\"apc/src/<xsl:value-of select="@source"/>.svg\"/&gt;"
+     ]
+    }<xsl:if test="position() != last()">,</xsl:if>
+  </xsl:template>
+
+
+  <xsl:template match="figure">
+    {
+     "cell_type": "markdown",
+     "metadata": {
+      "collapsed": false,
+      "editable": false
+     },
+     "source": [
+        "&lt;img src=\"apc/src/<xsl:value-of select="image/@source"/>.svg\"/&gt;\n\n",
+        "<xsl:apply-templates select="caption"/>"
+     ]
+    }<xsl:if test="position() != last()">,</xsl:if>
+  </xsl:template>
+
+  <xsl:template match="table">
+    {
+     "cell_type": "markdown",
+     "metadata": {
+      "collapsed": false,
+      "editable": false
+     },
+     "source": [
+        "&lt;table&gt;<xsl:apply-templates select="tabular/row"/>&lt;/table&gt;\n\n",
+        "<xsl:apply-templates select="caption"/>"
+     ]
+    }<xsl:if test="position() != last()">,</xsl:if>
+  </xsl:template>
+  <xsl:template match="row">&lt;tr&gt;<xsl:apply-templates select="cell"/>&lt;/tr&gt;</xsl:template>
+  <xsl:template match="cell">&lt;td&gt;<xsl:value-of select="normalize-space(.)"/>&lt;/td&gt;</xsl:template>
+
+  <xsl:template match="figure">
+    {
+     "cell_type": "markdown",
+     "metadata": {
+      "collapsed": false,
+      "editable": false
+     },
+     "source": [
+        "&lt;img src=\"apc/src/<xsl:value-of select="image/@source"/>.svg\"/&gt;\n\n",
+        "<xsl:apply-templates select="caption"/>"
+     ]
+    }<xsl:if test="position() != last()">,</xsl:if>
+  </xsl:template>
+
+  <xsl:template match="m"> \\(<xsl:value-of select="normalize-space(.)"/>\\) </xsl:template>
+  <xsl:template match="p/text()|caption"><xsl:value-of select="normalize-space(.)"/></xsl:template>
+
+</xsl:stylesheet>
