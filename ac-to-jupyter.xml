@@ -33,7 +33,15 @@
       "collapsed": false,
       "editable": <xsl:choose><xsl:when test="$editable"><xsl:value-of select="normalize-space($editable)"/></xsl:when><xsl:otherwise>false</xsl:otherwise></xsl:choose>
      },
-     "source": "<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space($source)"/></xsl:call-template>"
+    "source": 
+    <xsl:choose>
+      <xsl:when test="$editable">
+        "&lt;div style=\"margin:1em;color:#ccc;font-size:2em;text-align:center;\"&gt;Enter your reponse here.&lt;/div&gt;"
+      </xsl:when>
+      <xsl:otherwise>
+        "&lt;div style=\"background-color:#f8f8f8;padding:1em;border-radius:10px;box-shadow:4px 4px 3px #ddd;margin:5px;\"\n\n&gt;<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space($source)"/></xsl:call-template>\n\n&lt;/div&gt;"
+      </xsl:otherwise>
+    </xsl:choose>
     }
   </xsl:template>
 
@@ -54,14 +62,15 @@
   <!-- Supported PreTeXt elements -->
 
   <xsl:template match="exploration|activity">
-    <xsl:call-template name="jupyter-cell">
+    <!--xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
         &lt;hr&gt;
       </xsl:with-param>
-    </xsl:call-template>
+    </xsl:call-template>-->
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        ## <xsl:if test="local-name()='exploration'">Preview </xsl:if>Activity 1.1.<xsl:value-of select="position()"/>
+        ## <xsl:if test="local-name()='exploration'">Preview </xsl:if>
+        Activity 1.1.<xsl:value-of select="position()"/>
       </xsl:with-param>
     </xsl:call-template>
     <xsl:apply-templates select="statement"/>
@@ -96,15 +105,13 @@
   <xsl:template match="li">
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        <xsl:number format="a. "/> <xsl:apply-templates select="*[position()=1]" mode="markdown"/>
+        &lt;b&gt;<xsl:number format="a. "/>&lt;/b&gt;
+        <xsl:apply-templates select="*[position()=1]" mode="markdown"/>
       </xsl:with-param>
     </xsl:call-template>
     <xsl:apply-templates select="*[position()>1]"/>
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="editable">true</xsl:with-param>
-      <xsl:with-param name="source">
-        &lt;span style="color:#ccc"&gt;Enter solution here.&lt;/span&gt;
-      </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
 
