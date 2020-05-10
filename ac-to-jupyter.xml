@@ -36,10 +36,10 @@
     "source": 
     <xsl:choose>
       <xsl:when test="$editable">
-        "&lt;div style=\"margin:1em;color:#ccc;font-size:2em;text-align:center;\"&gt;Enter your reponse here.&lt;/div&gt;"
+        "&lt;div style=\"margin:1em;color:#ccc;font-size:2em;text-align:center;\"&gt;Enter your response here.&lt;/div&gt;"
       </xsl:when>
       <xsl:otherwise>
-        "&lt;div style=\"background-color:#f8f8f8;padding:1em;border-radius:10px;box-shadow:4px 4px 3px #ddd;margin:5px;\"\n\n&gt;<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space($source)"/></xsl:call-template>\n\n&lt;/div&gt;"
+        "&lt;div style=\"background-color:#f8f8f8;padding:1em;border-radius:10px;box-shadow:4px 4px 3px #ddd;margin:5px;\"&gt;\n\n<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space($source)"/></xsl:call-template>\n\n&lt;/div&gt;"
       </xsl:otherwise>
     </xsl:choose>
     }
@@ -98,7 +98,15 @@
     <xsl:apply-templates select="m|text()"/>
   </xsl:template>
 
-  <xsl:template match="sidebyside|ol|ul">
+  <xsl:template match="sidebyside">
+    <xsl:call-template name="jupyter-cell">
+      <xsl:with-param name="source">
+        <xsl:apply-templates select="*" mode="markdown"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template match="ol|ul">
     <xsl:apply-templates select="*"/>
   </xsl:template>
 
@@ -115,30 +123,21 @@
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="image">
+  <xsl:template match="image|figure|table">
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        &lt;img src="apc/src/<xsl:value-of select="@source"/>.svg"/&gt;
+        <xsl:apply-templates select="." mode="markdown"/>
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
-
-  <xsl:template match="figure">
-    <xsl:call-template name="jupyter-cell">
-      <xsl:with-param name="source">
-        &lt;img src="apc/src/<xsl:value-of select="image/@source"/>.svg"/&gt;
-        <xsl:apply-templates select="caption"/>
-      </xsl:with-param>
-    </xsl:call-template>
+  <xsl:template match="image" mode="markdown">
+    &lt;img src="apc/src/<xsl:value-of select="@source"/>.svg"/&gt;
   </xsl:template>
-
-  <xsl:template match="table">
-    <xsl:call-template name="jupyter-cell">
-      <xsl:with-param name="source">
-        &lt;table&gt;<xsl:apply-templates select="tabular/row"/>&lt;/table&gt;
-        <xsl:apply-templates select="caption"/>
-      </xsl:with-param>
-    </xsl:call-template>
+  <xsl:template match="figure" mode="markdown">
+    &lt;figure&gt;&lt;figcaption&gt;<xsl:apply-templates select="caption"/>&lt;/figcaption&gt;<xsl:apply-templates select="image" mode="markdown"/>&lt;/figure&gt;
+  </xsl:template>
+  <xsl:template match="table" mode="markdown">
+    &lt;table&gt;&lt;caption&gt;<xsl:apply-templates select="caption"/>&lt;/caption&gt;<xsl:apply-templates select="tabular/row"/>&lt;/table&gt;
   </xsl:template>
 
   <xsl:template match="row">
