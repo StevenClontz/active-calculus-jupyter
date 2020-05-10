@@ -30,18 +30,14 @@
         "editable": false
        },
        "source": [
-          "# (Section No.) (Title goes here)"
+          "# 1.1 <xsl:value-of select="section/title"/>"
        ]
       }
       <xsl:apply-templates select="//activity|//exploration"/>
     ]}
   </xsl:template>
 
-  <xsl:template match="activity|exploration">
-    <xsl:apply-templates select="statement"/>
-  </xsl:template>
-
-  <xsl:template match="statement">
+  <xsl:template match="exploration">
     ,
     {
      "cell_type": "markdown",
@@ -50,9 +46,30 @@
       "editable": false
      },
      "source": [
-        "## (Preview) Activity (No.)"
+        "&lt;hr&gt;\n\n",
+        "## Preview Activity 1.1.<xsl:value-of select="position()"/>"
      ]
     }
+    <xsl:apply-templates select="statement"/>
+  </xsl:template>
+
+  <xsl:template match="activity">
+    ,
+    {
+     "cell_type": "markdown",
+     "metadata": {
+      "collapsed": false,
+      "editable": false
+     },
+     "source": [
+        "&lt;hr&gt;\n\n",
+        "## Activity 1.1.<xsl:value-of select="position()"/>"
+     ]
+    }
+    <xsl:apply-templates select="statement"/>
+  </xsl:template>
+
+  <xsl:template match="statement">
     <xsl:apply-templates select="*"/>
   </xsl:template>
 
