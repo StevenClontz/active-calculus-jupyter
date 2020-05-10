@@ -33,8 +33,7 @@
           "# (Section No.) (Title goes here)"
        ]
       }
-      ,
-      <xsl:apply-templates select="activity|exploration"/>
+      <xsl:apply-templates select="//activity|//exploration"/>
     ]}
   </xsl:template>
 
@@ -43,23 +42,24 @@
   </xsl:template>
 
   <xsl:template match="statement">
-      {
-       "cell_type": "markdown",
-       "metadata": {
-        "collapsed": false,
-        "editable": false
-       },
-       "source": [
-          "## (Preview) Activity (No.)"
-       ]
-      }
-      ,
+    ,
+    {
+     "cell_type": "markdown",
+     "metadata": {
+      "collapsed": false,
+      "editable": false
+     },
+     "source": [
+        "## (Preview) Activity (No.)"
+     ]
+    }
     <xsl:apply-templates select="*"/>
   </xsl:template>
 
   <xsl:template match="p">
     <xsl:choose>
       <xsl:when test="text()[normalize-space()]">
+        ,
         {
          "cell_type": "markdown",
          "metadata": {
@@ -75,16 +75,15 @@
         <xsl:apply-templates select="*"/>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:if test="position() != last()">,</xsl:if>
   </xsl:template>
   <xsl:template match="p" mode="markdown"><xsl:apply-templates select="m|text()"/></xsl:template>
 
   <xsl:template match="sidebyside|ol|ul">
     <xsl:apply-templates select="*"/>
-    <xsl:if test="position() != last()">,</xsl:if>
   </xsl:template>
 
   <xsl:template match="li">
+    ,
     {
      "cell_type": "markdown",
      "metadata": {
@@ -95,8 +94,8 @@
         "<xsl:number format="a. "/> <xsl:apply-templates select="*[position()=1]" mode="markdown"/>"
      ]
     }
+    <xsl:apply-templates select="*[position()>1]"/>
     ,
-    <xsl:if test="*[position()>1]"><xsl:apply-templates select="*[position()>1]"/>,</xsl:if>
     {
      "cell_type": "markdown",
      "metadata": {
@@ -105,10 +104,10 @@
      },
      "source": "&lt;span style=\"color:#ccc\"&gt;Enter solution here.&lt;/span&gt;"
     }
-    <xsl:if test="position() != last()">,</xsl:if>
   </xsl:template>
 
   <xsl:template match="image">
+    ,
     {
      "cell_type": "markdown",
      "metadata": {
@@ -119,11 +118,11 @@
         "&lt;img src=\"apc/src/<xsl:value-of select="@source"/>.svg\"/&gt;"
      ]
     }
-    <xsl:if test="position() != last()">,</xsl:if>
   </xsl:template>
 
 
   <xsl:template match="figure">
+    ,
     {
      "cell_type": "markdown",
      "metadata": {
@@ -135,10 +134,10 @@
         "<xsl:apply-templates select="caption"/>"
      ]
     }
-    <xsl:if test="position() != last()">,</xsl:if>
   </xsl:template>
 
   <xsl:template match="table">
+    ,
     {
      "cell_type": "markdown",
      "metadata": {
@@ -150,12 +149,12 @@
         "<xsl:apply-templates select="caption"/>"
      ]
     }
-    <xsl:if test="position() != last()">,</xsl:if>
   </xsl:template>
   <xsl:template match="row">&lt;tr&gt;<xsl:apply-templates select="cell"/>&lt;/tr&gt;</xsl:template>
   <xsl:template match="cell">&lt;td&gt;<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space(.)"/></xsl:call-template>&lt;/td&gt;</xsl:template>
 
   <xsl:template match="figure">
+    ,
     {
      "cell_type": "markdown",
      "metadata": {
@@ -167,7 +166,6 @@
         "<xsl:apply-templates select="caption"/>"
      ]
     }
-    <xsl:if test="position() != last()">,</xsl:if>
   </xsl:template>
 
   <xsl:template match="m"> \\(<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space(.)"/></xsl:call-template>\\) </xsl:template>
