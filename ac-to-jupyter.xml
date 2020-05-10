@@ -20,52 +20,50 @@
     <xsl:variable name="sans-return"    select="str:replace($sans-newline,   '&#x0d;', '\r'     )"/>
     <xsl:value-of select="$sans-return" />
   </xsl:template>
+  
+  <!-- Basic Jupyter Cell -->
+  <xsl:template name="jupyter-cell">
+    <xsl:param name="source"/>
+    <xsl:param name="editable"/>
+    <xsl:param name="first-cell"/>
+    <xsl:if test="not($first-cell)">,</xsl:if>
+    {
+     "cell_type": "markdown",
+     "metadata": {
+      "collapsed": false,
+      "editable": <xsl:choose><xsl:when test="$editable"><xsl:value-of select="normalize-space($editable)"/></xsl:when><xsl:otherwise>false</xsl:otherwise></xsl:choose>
+     },
+     "source": "<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space($source)"/></xsl:call-template>"
+    }
+  </xsl:template>
 
+  <!-- Jupyter JSON object -->
   <xsl:template match="/">
     {"cells": [
-      {
-       "cell_type": "markdown",
-       "metadata": {
-        "collapsed": false,
-        "editable": false
-       },
-       "source": [
-          "# 1.1 <xsl:value-of select="section/title"/>"
-       ]
-      }
+      <xsl:call-template name="jupyter-cell">
+        <xsl:with-param name="first-cell">true</xsl:with-param>
+        <xsl:with-param name="source">
+          # 1.1 <xsl:value-of select="section/title"/>
+        </xsl:with-param>
+      </xsl:call-template>
       <xsl:apply-templates select="//activity|//exploration"/>
     ]}
   </xsl:template>
 
-  <xsl:template match="exploration">
-    ,
-    {
-     "cell_type": "markdown",
-     "metadata": {
-      "collapsed": false,
-      "editable": false
-     },
-     "source": [
-        "&lt;hr&gt;\n\n",
-        "## Preview Activity 1.1.<xsl:value-of select="position()"/>"
-     ]
-    }
-    <xsl:apply-templates select="statement"/>
-  </xsl:template>
 
-  <xsl:template match="activity">
-    ,
-    {
-     "cell_type": "markdown",
-     "metadata": {
-      "collapsed": false,
-      "editable": false
-     },
-     "source": [
-        "&lt;hr&gt;\n\n",
-        "## Activity 1.1.<xsl:value-of select="position()"/>"
-     ]
-    }
+  <!-- Supported PreTeXt elements -->
+
+  <xsl:template match="exploration|activity">
+    <xsl:call-template name="jupyter-cell">
+      <xsl:with-param name="source">
+        &lt;hr&gt;
+      </xsl:with-param>
+    </xsl:call-template>
+    <xsl:call-template name="jupyter-cell">
+      <xsl:with-param name="source">
+        ## <xsl:if test="local-name()='exploration'">Preview </xsl:if>Activity 1.1.<xsl:value-of select="position()"/>
+      </xsl:with-param>
+    </xsl:call-template>
     <xsl:apply-templates select="statement"/>
   </xsl:template>
 
@@ -76,116 +74,80 @@
   <xsl:template match="p">
     <xsl:choose>
       <xsl:when test="text()[normalize-space()]">
-        ,
-        {
-         "cell_type": "markdown",
-         "metadata": {
-          "collapsed": false,
-          "editable": false
-         },
-         "source": [
-            "<xsl:apply-templates select="." mode="markdown"/>"
-         ]
-        }
+        <xsl:call-template name="jupyter-cell">
+          <xsl:with-param name="source">
+            <xsl:apply-templates select="." mode="markdown"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="*"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  <xsl:template match="p" mode="markdown"><xsl:apply-templates select="m|text()"/></xsl:template>
+  <xsl:template match="p" mode="markdown">
+    <xsl:apply-templates select="m|text()"/>
+  </xsl:template>
 
   <xsl:template match="sidebyside|ol|ul">
     <xsl:apply-templates select="*"/>
   </xsl:template>
 
   <xsl:template match="li">
-    ,
-    {
-     "cell_type": "markdown",
-     "metadata": {
-      "collapsed": false,
-      "editable": false
-     },
-     "source": [
-        "<xsl:number format="a. "/> <xsl:apply-templates select="*[position()=1]" mode="markdown"/>"
-     ]
-    }
+    <xsl:call-template name="jupyter-cell">
+      <xsl:with-param name="source">
+        <xsl:number format="a. "/> <xsl:apply-templates select="*[position()=1]" mode="markdown"/>
+      </xsl:with-param>
+    </xsl:call-template>
     <xsl:apply-templates select="*[position()>1]"/>
-    ,
-    {
-     "cell_type": "markdown",
-     "metadata": {
-      "collapsed": false,
-      "editable": true
-     },
-     "source": "&lt;span style=\"color:#ccc\"&gt;Enter solution here.&lt;/span&gt;"
-    }
+    <xsl:call-template name="jupyter-cell">
+      <xsl:with-param name="editable">true</xsl:with-param>
+      <xsl:with-param name="source">
+        &lt;span style="color:#ccc"&gt;Enter solution here.&lt;/span&gt;
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template match="image">
-    ,
-    {
-     "cell_type": "markdown",
-     "metadata": {
-      "collapsed": false,
-      "editable": false
-     },
-     "source": [
-        "&lt;img src=\"apc/src/<xsl:value-of select="@source"/>.svg\"/&gt;"
-     ]
-    }
+    <xsl:call-template name="jupyter-cell">
+      <xsl:with-param name="source">
+        &lt;img src="apc/src/<xsl:value-of select="@source"/>.svg"/&gt;
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
-
   <xsl:template match="figure">
-    ,
-    {
-     "cell_type": "markdown",
-     "metadata": {
-      "collapsed": false,
-      "editable": false
-     },
-     "source": [
-        "&lt;img src=\"apc/src/<xsl:value-of select="image/@source"/>.svg\"/&gt;\n\n",
-        "<xsl:apply-templates select="caption"/>"
-     ]
-    }
+    <xsl:call-template name="jupyter-cell">
+      <xsl:with-param name="source">
+        &lt;img src="apc/src/<xsl:value-of select="image/@source"/>.svg"/&gt;
+        <xsl:apply-templates select="caption"/>
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template match="table">
-    ,
-    {
-     "cell_type": "markdown",
-     "metadata": {
-      "collapsed": false,
-      "editable": false
-     },
-     "source": [
-        "&lt;table&gt;<xsl:apply-templates select="tabular/row"/>&lt;/table&gt;\n\n",
-        "<xsl:apply-templates select="caption"/>"
-     ]
-    }
-  </xsl:template>
-  <xsl:template match="row">&lt;tr&gt;<xsl:apply-templates select="cell"/>&lt;/tr&gt;</xsl:template>
-  <xsl:template match="cell">&lt;td&gt;<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space(.)"/></xsl:call-template>&lt;/td&gt;</xsl:template>
-
-  <xsl:template match="figure">
-    ,
-    {
-     "cell_type": "markdown",
-     "metadata": {
-      "collapsed": false,
-      "editable": false
-     },
-     "source": [
-        "&lt;img src=\"apc/src/<xsl:value-of select="image/@source"/>.svg\"/&gt;\n\n",
-        "<xsl:apply-templates select="caption"/>"
-     ]
-    }
+    <xsl:call-template name="jupyter-cell">
+      <xsl:with-param name="source">
+        &lt;table&gt;<xsl:apply-templates select="tabular/row"/>&lt;/table&gt;
+        <xsl:apply-templates select="caption"/>
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="m"> \\(<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space(.)"/></xsl:call-template>\\) </xsl:template>
+  <xsl:template match="row">
+    &lt;tr&gt;<xsl:apply-templates select="cell"/>&lt;/tr&gt;
+  </xsl:template>
+
+  <xsl:template match="cell">
+    &lt;td&gt;
+      <xsl:call-template name="escape-json-string">
+        <xsl:with-param name="text" select="normalize-space(.)"/>
+      </xsl:call-template>
+    &lt;/td&gt;
+  </xsl:template>
+
+  <xsl:template match="m"> \(<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space(.)"/></xsl:call-template>\) </xsl:template>
+
   <xsl:template match="text()|caption"><xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space(.)"/></xsl:call-template></xsl:template>
 
 </xsl:stylesheet>
