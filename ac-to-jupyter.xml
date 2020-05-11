@@ -51,7 +51,8 @@
       <xsl:call-template name="jupyter-cell">
         <xsl:with-param name="first-cell">true</xsl:with-param>
         <xsl:with-param name="source">
-          # 1.1 <xsl:value-of select="section/title"/>
+          &lt;style&gt;.sidebyside{display:flex}.sidebyside *{flex-grow:1;padding-right:1em}.table{width:100% !IMPORTANT}caption{caption-side:top}&lt;/style&gt;
+          &lt;h1 class="foo"&gt;1.1 <xsl:value-of select="section/title"/>&lt;/h1&gt;
         </xsl:with-param>
       </xsl:call-template>
       <xsl:apply-templates select="//activity|//exploration"/>
@@ -101,7 +102,9 @@
   <xsl:template match="sidebyside">
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        <xsl:apply-templates select="*" mode="markdown"/>
+        &lt;div class="sidebyside"&gt;
+          <xsl:apply-templates select="*" mode="markdown"/>
+        &lt;/div&gt;
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
@@ -131,13 +134,13 @@
     </xsl:call-template>
   </xsl:template>
   <xsl:template match="image" mode="markdown">
-    &lt;img src="apc/src/<xsl:value-of select="@source"/>.svg"/&gt;
+    &lt;div&gt;&lt;img src="apc/src/<xsl:value-of select="@source"/>.svg"/&gt;&lt;/div&gt;
   </xsl:template>
   <xsl:template match="figure" mode="markdown">
-    &lt;figure&gt;&lt;figcaption&gt;<xsl:apply-templates select="caption"/>&lt;/figcaption&gt;<xsl:apply-templates select="image" mode="markdown"/>&lt;/figure&gt;
+    &lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;<xsl:apply-templates select="caption"/>&lt;/figcaption&gt;<xsl:apply-templates select="image" mode="markdown"/>&lt;/figure&gt;&lt;/div&gt;
   </xsl:template>
   <xsl:template match="table" mode="markdown">
-    &lt;table&gt;&lt;caption&gt;<xsl:apply-templates select="caption"/>&lt;/caption&gt;<xsl:apply-templates select="tabular/row"/>&lt;/table&gt;
+    &lt;div&gt;&lt;table&gt;&lt;caption&gt;<xsl:apply-templates select="caption"/>&lt;/caption&gt;<xsl:apply-templates select="tabular/row"/>&lt;/table&gt;&lt;/div&gt;
   </xsl:template>
 
   <xsl:template match="row">
