@@ -7,6 +7,7 @@
 >
 
   <xsl:output method="text" encoding="UTF-8"/>
+  <xsl:strip-space elements="*"/>
 
   <!-- JSON Escaped Strings -->
   <!-- stolen from PreTeXt -->
@@ -46,8 +47,20 @@
     }
   </xsl:template>
 
+  <xsl:template name="minimize">
+    <xsl:param name="data"/>
+    <xsl:value-of select="normalize-space($data)"/>
+  </xsl:template>
+
   <!-- Jupyter JSON object -->
   <xsl:template match="/">
+    <xsl:call-template name="minimize">
+        <xsl:with-param name="data">
+            <xsl:apply-templates select="." mode="unminimized"/>
+        </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+  <xsl:template match="/" mode="unminimized">
     {"nbformat": 4,"nbformat_minor": 0,"cells": [
       <xsl:call-template name="jupyter-cell">
         <xsl:with-param name="first-cell">true</xsl:with-param>
