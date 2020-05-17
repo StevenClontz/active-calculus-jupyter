@@ -48,7 +48,7 @@
 
   <!-- Jupyter JSON object -->
   <xsl:template match="/">
-    {"cells": [
+    {"nbformat": 4,"nbformat_minor": 0,"cells": [
       <xsl:call-template name="jupyter-cell">
         <xsl:with-param name="first-cell">true</xsl:with-param>
         <xsl:with-param name="source">
