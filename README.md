@@ -1,6 +1,10 @@
 # active-calculus-jupyter
 
-Assumes a copy of Active Prelude to Calculus is in a folder `apc`.
+You'll need a copy of Active Prelude to Calculus in the folder `apc`:
+
+```
+git clone https://github.com/active-calculus/prep.git apc
+```
 
 To provision python libraries: *(replace `python` with `python3` if necessary)*
 
