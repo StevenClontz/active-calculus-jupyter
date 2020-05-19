@@ -1,7 +1,15 @@
 # active-calculus-jupyter
 
-For images to load, put a copy of textbook source in the folder 'apc'.
+Assumes a copy of Active Prelude to Calculus is in a folder `apc`.
+
+To provision python libraries: *(replace `python` with `python3` if necessary)*
 
 ```
-xsltproc --output sample.ipynb --xinclude ac-to-jupyter.xml apc/src/sec-changing-in-tandem.xml
+python -m pipenv install
+```
+
+To build the notebooks:
+
+```
+python -m pipenv run python build.py
 ```
