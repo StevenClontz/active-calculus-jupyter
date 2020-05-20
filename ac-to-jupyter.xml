@@ -57,11 +57,11 @@
   <xsl:template match="/">
     <xsl:call-template name="minimize">
         <xsl:with-param name="data">
-            <xsl:apply-templates select="." mode="unminimized"/>
+          <xsl:apply-templates select="section"/>
         </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
-  <xsl:template match="/" mode="unminimized">
+  <xsl:template match="section">
     {"nbformat": 4,"nbformat_minor": 0,"cells": [
       <xsl:call-template name="jupyter-cell">
         <xsl:with-param name="first-cell">true</xsl:with-param>
@@ -69,7 +69,7 @@
           &lt;style&gt;
             .editable{margin:1em;color:#ccc;font-size:2em;text-align:center;}
             .not-editable{background-color:#f8f8f8;padding:1em;border-radius:10px;box-shadow:4px 4px 3px #ddd;margin:5px;}
-            .sidebyside{display:flex;justify-content:center}
+            .sidebyside{display:flex;justify-content:center;}
             .sidebyside > *{margin-right:1em}
             .not-implemented{color:#f00;font-weight:bold;}
             caption{caption-side:top;white-space: nowrap;color:rgba(0,0,0,.45)}
@@ -77,12 +77,19 @@
             .fillin{display:inline-block;width:10em;margin-left:0.2em;margin-right:0.2em;height:1em;border-bottom:1px black solid;}
             .fn{font-size:0.8em;color:rgba(0,0,0.45)}
           &lt;/style&gt;
-          &lt;h1 class="foo"&gt;<xsl:value-of select="$section"/>&#160;<xsl:value-of select="section/title"/>&lt;/h1&gt;
+          &lt;h1 class="foo"&gt;<xsl:value-of select="$section"/>&#160;<xsl:value-of select="title"/>&lt;/h1&gt;
+          &lt;div&gt;<xsl:apply-templates select="." mode="link"/>&lt;/div&gt;
           &lt;span style="display:none;"&gt;\(\newcommand{\amp}{&amp;}\)&lt;/span&gt;
         </xsl:with-param>
       </xsl:call-template>
       <xsl:apply-templates select="//activity|//exploration"/>
     ]}
+  </xsl:template>
+  <xsl:template match="section" mode="url">
+    https://activecalculus.org/prelude/<xsl:value-of select="./@xml:id"/>.html
+  </xsl:template>
+  <xsl:template match="section" mode="link">
+    &lt;a href="<xsl:apply-templates select="." mode="url"/>"&gt;<xsl:apply-templates select="." mode="url"/>&lt;/a&gt;
   </xsl:template>
 
 
@@ -91,8 +98,7 @@
   <xsl:template match="exploration|activity">
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        &lt;h2&gt; <xsl:if test="local-name()='exploration'">Preview </xsl:if>
-        Activity <xsl:value-of select="$section"/>.<xsl:value-of select="position()"/>&lt;/h2&gt;
+        &lt;h2&gt;<xsl:apply-templates select="." mode="name"/>&lt;/h2&gt;
       </xsl:with-param>
     </xsl:call-template>
     <xsl:choose>
@@ -108,6 +114,15 @@
         <xsl:with-param name="editable">true</xsl:with-param>
       </xsl:call-template>
     </xsl:if>
+  </xsl:template>
+  <xsl:template match="exploration|activity" mode="number">
+    <xsl:value-of select="$section"/>.<xsl:number from="//section" level="any" count="exploration|activity"/>
+  </xsl:template>
+  <xsl:template match="exploration" mode="name">
+    Preview Activity <xsl:apply-templates select="." mode="number"/>
+  </xsl:template>
+  <xsl:template match="activity" mode="name">
+    Activity <xsl:apply-templates select="." mode="number"/>
   </xsl:template>
 
   <xsl:template match="statement">
@@ -191,10 +206,14 @@
     &lt;div&gt;&lt;img src="../../apc/src/<xsl:value-of select="@source"/>.svg"/&gt;&lt;/div&gt;
   </xsl:template>
   <xsl:template match="figure" mode="markdown">
-    &lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;<xsl:apply-templates select="caption" mode="markdown"/>&lt;/figcaption&gt;<xsl:apply-templates select="image" mode="markdown"/>&lt;/figure&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;
+      &lt;b&gt;<xsl:apply-templates select="." mode="name"/>.&lt;/b&gt; <xsl:apply-templates select="caption" mode="markdown"/>
+    &lt;/figcaption&gt;<xsl:apply-templates select="image" mode="markdown"/>&lt;/figure&gt;&lt;/div&gt;
   </xsl:template>
   <xsl:template match="table" mode="markdown">
-    &lt;div&gt;&lt;table&gt;&lt;caption&gt;<xsl:apply-templates select="caption" mode="markdown"/>&lt;/caption&gt;<xsl:apply-templates select="tabular/row" mode="markdown"/>&lt;/table&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;table&gt;&lt;caption&gt;
+      &lt;b&gt;<xsl:apply-templates select="." mode="name"/>.&lt;/b&gt; <xsl:apply-templates select="caption" mode="markdown"/>
+    &lt;/caption&gt;<xsl:apply-templates select="tabular/row" mode="markdown"/>&lt;/table&gt;&lt;/div&gt;
   </xsl:template>
   <xsl:template match="tabular" mode="markdown">
     &lt;div&gt;&lt;table&gt;<xsl:apply-templates select="row" mode="markdown"/>&lt;/table&gt;&lt;/div&gt;
@@ -214,7 +233,23 @@
   <xsl:template match="mrow" mode="markdown"><xsl:apply-templates select="text()" mode="markdown"/>\\</xsl:template>
   <xsl:template match="caption" mode="markdown"><xsl:apply-templates select="text()|*" mode="markdown"/></xsl:template>
   <xsl:template match="fillin" mode="markdown">&lt;span class="fillin"&gt;&lt;/span&gt;</xsl:template>
+  
+  <xsl:template match="table|figure|definition|example" mode="number">
+    <xsl:value-of select="$section"/>.<xsl:number from="//section" level="any" count="table|figure|definition|example"/>
+  </xsl:template>
+  <xsl:template match="table" mode="name">
+    Table <xsl:apply-templates select="." mode="number"/>
+  </xsl:template>
+  <xsl:template match="figure" mode="name">
+    Figure <xsl:apply-templates select="." mode="number"/>
+  </xsl:template>
+  <xsl:template match="definition" mode="name">
+    Definition <xsl:apply-templates select="." mode="number"/>
+  </xsl:template>
+  <xsl:template match="example" mode="name">
+    Example <xsl:apply-templates select="." mode="number"/>
+  </xsl:template>
 
-  <xsl:template match="xref" mode="markdown"> &lt;span class="not-implemented"&gt;XREF NOT IMPLEMENTED&lt;/span&gt; </xsl:template>
+  <xsl:template match="xref" mode="markdown"><xsl:apply-templates select="//*[@xml:id=current()/@ref]" mode="name"/></xsl:template>
 
 </xsl:stylesheet>
