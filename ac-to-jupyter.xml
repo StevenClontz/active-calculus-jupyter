@@ -9,6 +9,7 @@
   <xsl:output method="text" encoding="UTF-8"/>
 
   <xsl:param name="section" select="'0.0'"/>
+  <xsl:param name="includepreviews" select="'yes'"/>
 
   <!-- JSON Escaped Strings -->
   <!-- stolen from PreTeXt -->
@@ -36,7 +37,7 @@
       "collapsed": false,
       "editable": <xsl:choose><xsl:when test="$editable"><xsl:value-of select="normalize-space($editable)"/></xsl:when><xsl:otherwise>false</xsl:otherwise></xsl:choose>
      },
-    "source": 
+    "source":
     <xsl:choose>
       <xsl:when test="$editable">
         "&lt;div class=\"editable\"&gt;Enter your response/code here.&lt;/div&gt;"
@@ -76,10 +77,11 @@
             figcaption{padding-top:0.75em;padding-bottom:0.3em;color:rgba(0,0,0,.45)}
             .fillin{display:inline-block;width:10em;margin-left:0.2em;margin-right:0.2em;height:1em;border-bottom:1px black solid;}
             .fn{font-size:0.8em;color:rgba(0,0,0.45)}
+            .newcommands{display:none;}
           &lt;/style&gt;
-          &lt;h1 class="foo"&gt;<xsl:value-of select="$section"/>&#160;<xsl:value-of select="title"/>&lt;/h1&gt;
+          &lt;h1&gt;<xsl:value-of select="$section"/>&#160;<xsl:value-of select="title"/>&lt;/h1&gt;
           &lt;div&gt;<xsl:apply-templates select="." mode="link"/>&lt;/div&gt;
-          &lt;span style="display:none;"&gt;\(\newcommand{\amp}{&amp;}\)&lt;/span&gt;
+          &lt;span class="newcommands"&gt;\(\newcommand{\amp}{&amp;}\)&lt;/span&gt;
         </xsl:with-param>
       </xsl:call-template>
       <xsl:apply-templates select="//activity|//exploration"/>
@@ -102,23 +104,25 @@
   <!-- Supported PreTeXt elements -->
 
   <xsl:template match="exploration|activity">
-    <xsl:call-template name="jupyter-cell">
-      <xsl:with-param name="source">
-        &lt;h2&gt;<xsl:apply-templates select="." mode="name"/>&lt;/h2&gt;
-      </xsl:with-param>
-    </xsl:call-template>
-    <xsl:choose>
-      <xsl:when test="statement">
-        <xsl:apply-templates select="statement"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select="*"/>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:if test="not(.//ol[@label='a.'])">
+    <xsl:if test="$includepreviews='yes' or local-name()='activity'">
       <xsl:call-template name="jupyter-cell">
-        <xsl:with-param name="editable">true</xsl:with-param>
+        <xsl:with-param name="source">
+          &lt;h2&gt;<xsl:apply-templates select="." mode="name"/>&lt;/h2&gt;
+        </xsl:with-param>
       </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="statement">
+          <xsl:apply-templates select="statement"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="*"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:if test="not(.//ol[@label='a.'])">
+        <xsl:call-template name="jupyter-cell">
+          <xsl:with-param name="editable">true</xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
   <xsl:template match="exploration|activity" mode="number">
