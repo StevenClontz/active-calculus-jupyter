@@ -54,6 +54,25 @@
     <xsl:value-of select="normalize-space($data)"/>
   </xsl:template>
 
+  <xsl:template name="css">
+    &lt;style&gt;
+      .editable{margin:1em;color:#ccc;font-size:2em;text-align:center;}
+      .not-editable{background-color:#f8f8f8;padding:1em;border-radius:10px;box-shadow:4px 4px 3px #ddd;margin:5px;}
+      .sidebyside{display:flex;justify-content:center;}
+      .sidebyside > *{margin-right:1em}
+      .todo{color:#f00;font-weight:bold;}
+      caption{caption-side:top;white-space: nowrap;color:rgba(0,0,0,.45)}
+      figcaption{padding-top:0.75em;padding-bottom:0.3em;color:rgba(0,0,0,.45)}
+      .fillin{display:inline-block;width:10em;margin-left:0.2em;margin-right:0.2em;height:1em;border-bottom:1px black solid;}
+      .fn{font-size:0.8em;color:rgba(0,0,0.45)}
+      .newcommands{display:none;}
+    &lt;/style&gt;
+  </xsl:template>
+
+  <xsl:template name="newcommands">
+    &lt;span class="newcommands"&gt;\(\newcommand{\amp}{&amp;}\)&lt;/span&gt;
+  </xsl:template>
+
   <!-- Jupyter JSON object -->
   <xsl:template match="/">
     <xsl:call-template name="minimize">
@@ -67,21 +86,10 @@
       <xsl:call-template name="jupyter-cell">
         <xsl:with-param name="first-cell">true</xsl:with-param>
         <xsl:with-param name="source">
-          &lt;style&gt;
-            .editable{margin:1em;color:#ccc;font-size:2em;text-align:center;}
-            .not-editable{background-color:#f8f8f8;padding:1em;border-radius:10px;box-shadow:4px 4px 3px #ddd;margin:5px;}
-            .sidebyside{display:flex;justify-content:center;}
-            .sidebyside > *{margin-right:1em}
-            .not-implemented{color:#f00;font-weight:bold;}
-            caption{caption-side:top;white-space: nowrap;color:rgba(0,0,0,.45)}
-            figcaption{padding-top:0.75em;padding-bottom:0.3em;color:rgba(0,0,0,.45)}
-            .fillin{display:inline-block;width:10em;margin-left:0.2em;margin-right:0.2em;height:1em;border-bottom:1px black solid;}
-            .fn{font-size:0.8em;color:rgba(0,0,0.45)}
-            .newcommands{display:none;}
-          &lt;/style&gt;
+          <xsl:call-template name="css"/>
+          <xsl:call-template name="newcommands"/>
           &lt;h1&gt;<xsl:value-of select="$section"/>&#160;<xsl:value-of select="title"/>&lt;/h1&gt;
           &lt;div&gt;<xsl:apply-templates select="." mode="link"/>&lt;/div&gt;
-          &lt;span class="newcommands"&gt;\(\newcommand{\amp}{&amp;}\)&lt;/span&gt;
         </xsl:with-param>
       </xsl:call-template>
       <xsl:apply-templates select="//activity|//exploration"/>
