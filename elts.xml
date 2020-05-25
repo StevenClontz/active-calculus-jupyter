@@ -8,6 +8,7 @@
 
   <xsl:import href="./ac-to-jupyter.xml"/>
   <xsl:output method="text" encoding="UTF-8"/>
+  <xsl:param name="eltname" select="'Unnamed'"/>
 
   <xsl:template match="/">
     <xsl:call-template name="minimize">
@@ -18,7 +19,7 @@
               <xsl:with-param name="source">
                 <xsl:call-template name="css"/>
                 <xsl:call-template name="newcommands"/>
-                &lt;h1&gt;ELT Individual Workbook&lt;/h1&gt;
+                &lt;h1&gt;<xsl:value-of select="$eltname"/> - ELT Individual Workbook&lt;/h1&gt;
               </xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates select="//section"/>

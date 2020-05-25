@@ -50,9 +50,12 @@ ELTS = [
   },
 ]
 
-#def create_dir(path):
-#  if not os.path.exists(path):
-#    os.makedirs(path)
+def slugify(name):
+  return name.replace(' ', '-').lower()
+
+def create_dir(path):
+  if not os.path.exists(path):
+    os.makedirs(path)
 
 #@click.group()
 #def cli():
@@ -73,14 +76,16 @@ def build():
   xsl = etree.parse("elts.xml")
   transform = etree.XSLT(xsl)
   book.xinclude()
-  elt = etree.Element("elt")
-  for section_tuple in ELTS[2]["sections"]:
-    chapter=book.xpath("//chapter")[section_tuple[0]-1]
-    section=chapter.xpath(".//section")[section_tuple[1]-1]
-    dup_section = deepcopy(section)
-    dup_section.attrib['number']=str(section_tuple[0])+"."+str(section_tuple[1])
-    elt.append(dup_section)
-  transform(elt,section="'bar'",includepreviews="'yes'").write_output('bar.ipynb')
+  create_dir("elts")
+  for index, elt_obj in enumerate(ELTS, start=1):
+    elt = etree.Element("elt")
+    for section_tuple in elt_obj["sections"]:
+      chapter=book.xpath("//chapter")[section_tuple[0]-1]
+      section=chapter.xpath(".//section")[section_tuple[1]-1]
+      dup_section = deepcopy(section)
+      dup_section.attrib['number']=str(section_tuple[0])+"."+str(section_tuple[1])
+      elt.append(dup_section)
+    transform(elt,eltname="'"+elt_obj["name"]+"'",includepreviews="'yes'").write_output("elts/"+str(index).zfill(2)+"-"+slugify(elt_obj["name"])+".ipynb")
 
 #cli.add_command(build)
 #cli.add_command(list_section_ids)
