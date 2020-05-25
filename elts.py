@@ -2,6 +2,7 @@ from lxml import etree
 from copy import deepcopy
 import os
 import click
+from shutil import copytree
 
 ELTS = [
   {
@@ -86,6 +87,8 @@ def build():
       dup_section.attrib['number']=str(section_tuple[0])+"."+str(section_tuple[1])
       elt.append(dup_section)
     transform(elt,eltname="'"+elt_obj["name"]+"'",includepreviews="'yes'").write_output("elts/"+str(index).zfill(2)+"-"+slugify(elt_obj["name"])+".ipynb")
+  if not os.path.exists("elts/images"):
+    copytree("apc/src/images","elts/images")
 
 #cli.add_command(build)
 #cli.add_command(list_section_ids)

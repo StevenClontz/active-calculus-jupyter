@@ -40,10 +40,10 @@
     "source":
     <xsl:choose>
       <xsl:when test="$editable">
-        "&lt;div class=\"editable\"&gt;Enter your response/code here.&lt;/div&gt;"
+        "&lt;div class=\"editable\" style=\"<xsl:call-template name="css-editable"/>\"&gt;Enter your response/code here.&lt;/div&gt;"
       </xsl:when>
       <xsl:otherwise>
-        "&lt;div class=\"not-editable\"&gt;\n\n<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space($source)"/></xsl:call-template>\n\n&lt;/div&gt;"
+        "&lt;div class=\"not-editable\" style=\"<xsl:call-template name="css-not-editable"/>\"&gt;\n\n<xsl:call-template name="escape-json-string"><xsl:with-param name="text" select="normalize-space($source)"/></xsl:call-template>\n\n&lt;/div&gt;"
       </xsl:otherwise>
     </xsl:choose>
     }
@@ -54,23 +54,54 @@
     <xsl:value-of select="normalize-space($data)"/>
   </xsl:template>
 
-  <xsl:template name="css">
+  <!-- <xsl:template name="css"> TODO this seems to be broken in longer notebooks
     &lt;style&gt;
-      .editable{margin:1em;color:#ccc;font-size:2em;text-align:center;}
-      .not-editable{background-color:#f8f8f8;padding:1em;border-radius:10px;box-shadow:4px 4px 3px #ddd;margin:5px;}
-      .sidebyside{display:flex;justify-content:center;}
-      .sidebyside > *{margin-right:1em}
-      .todo{color:#f00;font-weight:bold;}
-      caption{caption-side:top;white-space: nowrap;color:rgba(0,0,0,.45)}
-      figcaption{padding-top:0.75em;padding-bottom:0.3em;color:rgba(0,0,0,.45)}
-      .fillin{display:inline-block;width:10em;margin-left:0.2em;margin-right:0.2em;height:1em;border-bottom:1px black solid;}
-      .fn{font-size:0.8em;color:rgba(0,0,0.45)}
-      .newcommands{display:none;}
+      .editable{<xsl:call-template name="css-editable"/>}
+      .not-editable{<xsl:call-template name="css-not-editable"/>}
+      .sidebyside{<xsl:call-template name="css-sidebyside"/>}
+      .sidebyside > *{<xsl:call-template name="css-sidebyside-child"/>}
+      .todo{<xsl:call-template name="css-todo"/>}
+      caption{<xsl:call-template name="css-caption"/>}
+      figcaption{<xsl:call-template name="css-figcaption"/>}
+      .fillin{<xsl:call-template name="css-fillin"/>}
+      .fn{<xsl:call-template name="css-fn"/>}
+      .newcommands{<xsl:call-template name="css-newcommands"/>}
     &lt;/style&gt;
+  </xsl:template>-->
+  <xsl:template name="css"/><!-- So for now the template is dummied out; smaller templates below should be used instead. -->
+  <xsl:template name="css-editable">
+    margin:1em;color:#ccc;font-size:2em;text-align:center;
+  </xsl:template>
+  <xsl:template name="css-not-editable">
+    background-color:#f8f8f8;padding:1em;border-radius:10px;box-shadow:4px 4px 3px #ddd;margin:5px;
+  </xsl:template>
+  <xsl:template name="css-sidebyside">
+    display:flex;justify-content:center;
+  </xsl:template>
+  <xsl:template name="css-sidebyside-child">
+    display:flex;justify-content:center;
+  </xsl:template>
+  <xsl:template name="css-todo">
+    color:#f00;font-weight:bold;
+  </xsl:template>
+  <xsl:template name="css-caption">
+    caption-side:top;white-space: nowrap;color:rgba(0,0,0,.45)}
+  </xsl:template>
+  <xsl:template name="css-figcaption">
+    padding-top:0.75em;padding-bottom:0.3em;color:rgba(0,0,0,.45)
+  </xsl:template>
+  <xsl:template name="css-fillin">
+    display:inline-block;width:10em;margin-left:0.2em;margin-right:0.2em;height:1em;border-bottom:1px black solid;
+  </xsl:template>
+  <xsl:template name="css-fn">
+    font-size:0.8em;color:rgba(0,0,0.45)
+  </xsl:template>
+  <xsl:template name="css-newcommands">
+    display:none;
   </xsl:template>
 
   <xsl:template name="newcommands">
-    &lt;span class="newcommands"&gt;\(\newcommand{\amp}{&amp;}\)&lt;/span&gt;
+    &lt;span class="newcommands" style="<xsl:call-template name="css-newcommands"/>"&gt;\(\newcommand{\amp}{&amp;}\)&lt;/span&gt;
   </xsl:template>
 
   <!-- Jupyter JSON object -->
@@ -172,7 +203,7 @@
   <xsl:template match="sidebyside">
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        &lt;div class="sidebyside"&gt;
+        &lt;div class="sidebyside" style="<xsl:call-template name="css-sidebyside"/>"&gt;
           <xsl:apply-templates select="*" mode="markdown"/>
         &lt;/div&gt;
       </xsl:with-param>
@@ -228,12 +259,12 @@
     &lt;div&gt;&lt;img src="<xsl:value-of select="@source"/>.svg"/&gt;&lt;/div&gt;
   </xsl:template>
   <xsl:template match="figure" mode="markdown">
-    &lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;
+    &lt;div&gt;&lt;figure&gt;&lt;figcaption style="<xsl:call-template name="css-figcaption"/>"&gt;
       &lt;b&gt;<xsl:apply-templates select="." mode="name"/>.&lt;/b&gt; <xsl:apply-templates select="caption" mode="markdown"/>
     &lt;/figcaption&gt;<xsl:apply-templates select="image" mode="markdown"/>&lt;/figure&gt;&lt;/div&gt;
   </xsl:template>
   <xsl:template match="table" mode="markdown">
-    &lt;div&gt;&lt;table&gt;&lt;caption&gt;
+    &lt;div&gt;&lt;table&gt;&lt;caption style="<xsl:call-template name="css-caption"/>"&gt;
       &lt;b&gt;<xsl:apply-templates select="." mode="name"/>.&lt;/b&gt; <xsl:apply-templates select="caption" mode="markdown"/>
     &lt;/caption&gt;<xsl:apply-templates select="tabular/row" mode="markdown"/>&lt;/table&gt;&lt;/div&gt;
   </xsl:template>
@@ -247,14 +278,14 @@
 
   <xsl:template match="cell" mode="markdown">&lt;td&gt;<xsl:apply-templates select="text()|*" mode="markdown"/>&lt;/td&gt;</xsl:template>
 
-  <xsl:template match="fn" mode="markdown"> &lt;span class="fn"&gt;(<xsl:apply-templates select="text()|*" mode="markdown"/>)&lt;/span&gt; </xsl:template>
+  <xsl:template match="fn" mode="markdown"> &lt;span class="fn" style="<xsl:call-template name="css-fn"/>"&gt;(<xsl:apply-templates select="text()|*" mode="markdown"/>)&lt;/span&gt; </xsl:template>
   <xsl:template match="q" mode="markdown">"<xsl:apply-templates select="text()|*" mode="markdown"/>"</xsl:template>
   <xsl:template match="m" mode="markdown">\(<xsl:apply-templates select="text()|*" mode="markdown"/>\)</xsl:template>
   <xsl:template match="me" mode="markdown">\[<xsl:apply-templates select="text()|*" mode="markdown"/>\]</xsl:template>
   <xsl:template match="md" mode="markdown">\[\begin{align*}<xsl:apply-templates select="mrow" mode="markdown"/>\end{align*}\]</xsl:template>
   <xsl:template match="mrow" mode="markdown"><xsl:apply-templates select="text()" mode="markdown"/>\\</xsl:template>
   <xsl:template match="caption" mode="markdown"><xsl:apply-templates select="text()|*" mode="markdown"/></xsl:template>
-  <xsl:template match="fillin" mode="markdown">&lt;span class="fillin"&gt;&lt;/span&gt;</xsl:template>
+  <xsl:template match="fillin" mode="markdown">&lt;span class="fillin" style="<xsl:call-template name="css-fillin"/>"&gt;&lt;/span&gt;</xsl:template>
   
   <xsl:template match="table|figure|definition|example" mode="number">
     <xsl:apply-templates select="./ancestor::section" mode="number"/>.<xsl:number from="//section" level="any" count="table|figure|definition|example"/>

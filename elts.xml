@@ -68,8 +68,4 @@
     <xsl:value-of select="@number"/>
   </xsl:template>
 
-  <xsl:template match="image" mode="markdown">
-    &lt;div&gt;&lt;img src="apc/src/<xsl:value-of select="@source"/>.svg"/&gt;&lt;/div&gt;
-  </xsl:template>
-
 </xsl:stylesheet>
