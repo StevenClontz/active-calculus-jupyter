@@ -101,8 +101,12 @@
   <xsl:template match="section" mode="link">
     &lt;a href="<xsl:apply-templates select="." mode="url"/>"&gt;<xsl:apply-templates select="." mode="url"/>&lt;/a&gt;
   </xsl:template>
+  <xsl:template match="section" mode="number">
+    <xsl:value-of select="$section"/>
+  </xsl:template>
+
   <xsl:template match="subsection" mode="number">
-    <xsl:value-of select="$section"/>.<xsl:number from="//section" level="any" count="subsection"/>
+    <xsl:apply-templates select="./ancestor::section" mode="number"/>.<xsl:number from="//section" level="any" count="subsection"/>
   </xsl:template>
   <xsl:template match="subsection" mode="name">
     Subsection <xsl:apply-templates select="." mode="number"/>
@@ -115,7 +119,7 @@
     <xsl:if test="$includepreviews='yes' or local-name()='activity'">
       <xsl:call-template name="jupyter-cell">
         <xsl:with-param name="source">
-          &lt;h2&gt;<xsl:apply-templates select="." mode="name"/>&lt;/h2&gt;
+          &lt;h3&gt;<xsl:apply-templates select="." mode="name"/>&lt;/h3&gt;
         </xsl:with-param>
       </xsl:call-template>
       <xsl:choose>
@@ -134,7 +138,7 @@
     </xsl:if>
   </xsl:template>
   <xsl:template match="exploration|activity" mode="number">
-    <xsl:value-of select="$section"/>.<xsl:number from="//section" level="any" count="exploration|activity"/>
+    <xsl:apply-templates select="./ancestor::section" mode="number"/>.<xsl:number from="//section" level="any" count="exploration|activity"/>
   </xsl:template>
   <xsl:template match="exploration" mode="name">
     Preview Activity <xsl:apply-templates select="." mode="number"/>
@@ -221,7 +225,7 @@
     </xsl:call-template>
   </xsl:template>
   <xsl:template match="image" mode="markdown">
-    &lt;div&gt;&lt;img src="../../apc/src/<xsl:value-of select="@source"/>.svg"/&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;img src="<xsl:value-of select="@source"/>.svg"/&gt;&lt;/div&gt;
   </xsl:template>
   <xsl:template match="figure" mode="markdown">
     &lt;div&gt;&lt;figure&gt;&lt;figcaption&gt;
@@ -253,7 +257,7 @@
   <xsl:template match="fillin" mode="markdown">&lt;span class="fillin"&gt;&lt;/span&gt;</xsl:template>
   
   <xsl:template match="table|figure|definition|example" mode="number">
-    <xsl:value-of select="$section"/>.<xsl:number from="//section" level="any" count="table|figure|definition|example"/>
+    <xsl:apply-templates select="./ancestor::section" mode="number"/>.<xsl:number from="//section" level="any" count="table|figure|definition|example"/>
   </xsl:template>
   <xsl:template match="table" mode="name">
     Table <xsl:apply-templates select="." mode="number"/>

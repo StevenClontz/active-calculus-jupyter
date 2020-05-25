@@ -30,14 +30,14 @@
   <xsl:template match="section">
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        &lt;h2&gt;<xsl:value-of select="position()"/><xsl:value-of select="$section"/>&#160;<xsl:value-of select="title"/>&lt;/h2&gt;
+        &lt;h2&gt;<xsl:value-of select="@number"/>&#160;<xsl:value-of select="title"/>&lt;/h2&gt;
         &lt;div&gt;<xsl:apply-templates select="." mode="link"/>&lt;/div&gt;
       </xsl:with-param>
     </xsl:call-template>
     <xsl:apply-templates select=".//exploration"/>
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        &lt;h3&gt;<xsl:value-of select="$section"/> Team Activities&lt;/h3&gt;
+        &lt;h3&gt;<xsl:value-of select="@number"/> Team Activities&lt;/h3&gt;
         &lt;p&gt;Add link to team activities below:&lt;/p&gt;
       </xsl:with-param>
     </xsl:call-template>
@@ -46,7 +46,7 @@
     </xsl:call-template>
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        &lt;h3&gt;<xsl:value-of select="$section"/> Homework&lt;/h3&gt;
+        &lt;h3&gt;<xsl:value-of select="@number"/> Homework&lt;/h3&gt;
         &lt;p class="todo"&gt;TODO implement homework&lt;/p&gt;
       </xsl:with-param>
     </xsl:call-template>
@@ -55,13 +55,16 @@
     </xsl:call-template>
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="source">
-        &lt;h3&gt;<xsl:value-of select="$section"/> Quiz&lt;/h3&gt;
+        &lt;h3&gt;<xsl:value-of select="@number"/> Quiz&lt;/h3&gt;
         &lt;p&gt;Insert photo of a "mastered quiz" below:&lt;/p&gt;
       </xsl:with-param>
     </xsl:call-template>
     <xsl:call-template name="jupyter-cell">
       <xsl:with-param name="editable">true</xsl:with-param>
     </xsl:call-template>
+  </xsl:template>
+  <xsl:template match="section" mode="number">
+    <xsl:value-of select="@number"/>
   </xsl:template>
 
   <xsl:template match="image" mode="markdown">

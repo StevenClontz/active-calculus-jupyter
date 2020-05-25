@@ -77,7 +77,9 @@ def build():
   for section_tuple in ELTS[2]["sections"]:
     chapter=book.xpath("//chapter")[section_tuple[0]-1]
     section=chapter.xpath(".//section")[section_tuple[1]-1]
-    elt.append(deepcopy(section))
+    dup_section = deepcopy(section)
+    dup_section.attrib['number']=str(section_tuple[0])+"."+str(section_tuple[1])
+    elt.append(dup_section)
   transform(elt,section="'bar'",includepreviews="'yes'").write_output('bar.ipynb')
 
 #cli.add_command(build)
