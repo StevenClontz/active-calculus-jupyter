@@ -12,7 +12,7 @@ def make_directory(path):
 def build(previews):
   include_previews = "'yes'" if previews else "'no'"
   book = etree.parse("apc/src/index.xml")
-  xsl = etree.parse("ac-to-jupyter.xml")
+  xsl = etree.parse("ac-to-jupyter.xsl")
   transform = etree.XSLT(xsl)
   book.xinclude()
   make_directory("activities")
