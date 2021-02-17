@@ -74,7 +74,7 @@ def create_dir(path):
 @click.command()
 def build():
   book = etree.parse("apc/src/index.xml")
-  xsl = etree.parse("elts.xml")
+  xsl = etree.parse("elts.xsl")
   transform = etree.XSLT(xsl)
   book.xinclude()
   create_dir("elts")
