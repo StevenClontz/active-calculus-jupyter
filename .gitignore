@@ -2,3 +2,4 @@ apc
 *.sage-jupyter2
 activities
 elts
+build
