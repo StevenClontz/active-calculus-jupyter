@@ -94,6 +94,17 @@ def build():
                                 sources.append(element_to_string(task,team=False))
                         else:
                             sources.append(element_to_string(element,team=False))
+            for exercise in section.xpath(".//exercises/exercise"):
+                if len(exercise.xpath("statement"))>0:
+                    sources.append(element_to_string(exercise,team=False))
+                    for intro in exercise.xpath("statement"):
+                        for element in intro.xpath("*"):
+                            tasks = element.xpath("ol")
+                            if len(tasks) > 0:
+                                for task in tasks[0].xpath("li"):
+                                    sources.append(element_to_string(task,team=False))
+                            else:
+                                sources.append(element_to_string(element,team=False))
             data = jupyter_dict(sources,team=False)
             for ext in ['ipynb']:
                 with open(f'{file_path}.{ext}', 'w', encoding='utf-8') as f:

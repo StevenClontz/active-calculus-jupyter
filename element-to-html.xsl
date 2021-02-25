@@ -194,7 +194,7 @@
             </span>
         </xsl:if>
     </xsl:template>
-    <xsl:template match="me">
+    <xsl:template match="me|men">
         <xsl:if test="text()|*">
             <span class="m">
                 $$<xsl:apply-templates select="text()|*" />$$
@@ -234,6 +234,27 @@
     <xsl:template match="example" mode="name">
         <xsl:text>Example </xsl:text>
         <xsl:apply-templates select="." mode="number"/>
+    </xsl:template>
+
+    <xsl:template match="men" mode="number">
+        <xsl:apply-templates select="./ancestor::section" mode="number"/>.<xsl:number from="//section" level="any" count="men"/>
+    </xsl:template>
+    <xsl:template match="men" mode="name">
+        <xsl:text>Equation </xsl:text>
+        <xsl:apply-templates select="." mode="number"/>
+    </xsl:template>
+
+    <xsl:template match="exercise" mode="number">
+        <xsl:number from="//exercises" level="any" count="exercise"/>
+    </xsl:template>
+    <xsl:template match="exercise" mode="name">
+        <xsl:text>Exercise </xsl:text>
+        <xsl:apply-templates select="." mode="number"/>
+    </xsl:template>
+    <xsl:template match="exercise">
+        <h2>
+            <xsl:apply-templates select="." mode="name"/>
+        </h2>
     </xsl:template>
 
     <xsl:template match="xref">
