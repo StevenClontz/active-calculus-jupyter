@@ -9,6 +9,7 @@
     <xsl:output method="html" encoding="UTF-8"/>
 
     <xsl:param name="target" select="/pretext/book/chapter[1]/section[1]"/>
+    <xsl:param name="notebook" select="'Team Notebook'"/>
 
     <xsl:template match="/">
         <xsl:apply-templates select="$target"/>
@@ -29,6 +30,9 @@
             <h1>
                 <xsl:apply-templates select="." mode="name"/>
             </h1>
+            <h2>
+                <xsl:value-of select="$notebook"/>
+            </h2>
             <div>
                 <a>
                     <xsl:attribute name="href">
